@@ -1,0 +1,199 @@
+DELIMITER $$
+
+ALTER ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vproductos` AS (
+SELECT
+  `productos`.`CodigoProducto`   AS `CodigoProducto`,
+  `productos`.`CodigoBarra`      AS `CodigoBarra`,
+  `productos`.`Descripcion`      AS `Descripcion`,
+  `productos`.`CantidadPaquete`  AS `CantidadPaquete`,
+  `productos`.`Peso`             AS `Peso`,
+  `productos`.`Perecedero`       AS `Perecedero`,
+  `productos`.`Estado`           AS `Estado`,
+  `representante`.`Descripcion`  AS `Representante`,
+  `unidadmedida`.`Descripcion`   AS `Media`,
+  `marcas`.`Descripcion`         AS `Marca`,
+   `marcas`.`CodigoMarca`         AS `CodigoMarca`,
+  `categorias`.`CodigoCategoria`   AS `CodigoCategoria`,
+  `categorias`.`Descripcion`     AS `Categoria`,
+  `tipoimpuesto`.`Descripcion`   AS `Impuesto`,
+  `tipoimpuesto`.`CodigImpuesto` AS `CodigImpuesto`,
+  `stock`.`StockActual`          AS `StockActual`,
+  `stock`.`StockMinimo`          AS `StockMinimo`,
+  `stock`.`StockMaximo`          AS `StockMaximo`,
+  `stock`.`PrecioCompra`         AS `PrecioCompra`,
+  `stock`.`UtilidadMinima`       AS `UtilidadMinima`,
+  `stock`.`UtilidadMaxima`       AS `UtilidadMaxima`,
+  `stock`.`PrecioVentaMinorista` AS `PrecioVentaMinorista`,
+  `stock`.`PrecioVentaMayorista` AS `PrecioVentaMayorista`,
+  `stock`.`Estante`              AS `Estante`,
+  `stock`.`Fila`                 AS `Fila`,
+  `stock`.`Columna`              AS `Columna`,
+  `depositos`.`codigoDeposito`   AS `CodigoDeposito`,
+  `depositos`.`Nombre`           AS `Deposito`
+FROM (((((((`stock`
+         JOIN `productos`
+           ON ((`stock`.`CodigoProducto` = `productos`.`CodigoProducto`)))
+        JOIN `depositos`
+          ON ((`stock`.`codigoDeposito` = `depositos`.`codigoDeposito`)))
+       JOIN `marcas`
+         ON ((`productos`.`CodigoMarca` = `marcas`.`CodigoMarca`)))
+      JOIN `categorias`
+        ON ((`productos`.`CodigoCategoria` = `categorias`.`CodigoCategoria`)))
+     JOIN `unidadmedida`
+       ON ((`productos`.`CodigoUnidad` = `unidadmedida`.`CodigoUnidad`)))
+    JOIN `tipoimpuesto`
+      ON ((`productos`.`CodigImpuesto` = `tipoimpuesto`.`CodigImpuesto`)))
+   JOIN `representante`
+     ON ((`productos`.`CodigoRepresentante` = `representante`.`CodigoRepresentante`))))$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+ALTER ALGORITHM=UNDEFINED DEFINER=`manager`@`%` SQL SECURITY DEFINER VIEW `vclientevehiculos` AS (
+SELECT
+  `clientes`.`Cedula`          AS `Cedula`,
+  `clientes`.`CodigoCliente`   AS `CodigoCliente`,
+  `clientes`.`Ruc`             AS `Ruc`,
+  `clientes`.`RazonSocial`     AS `RazonSocial`,
+  `tipostransmision`.`nombre`  AS `transmicion`,
+  `tipostransmision`.`codigotransmision`  AS `codigotransmision`,
+  `tracciones`.`nombre`        AS `traccion`,
+  `modelosvehiculos`.`nombre`  AS `modelo`,
+  `modelosvehiculos`.`codigomodelo`  AS `codigomodelo`,
+  `marcasvehiculos`.`nombre`   AS `marca`,
+  `marcasvehiculos`.`codigomarca`   AS `codigomarca`,
+  `tiposcombustibles`.`nombre` AS `combustible`,
+  `colores`.`nombre`           AS `color`,
+  `colores`.`codigocolor`           AS `codigocolor`,
+  `vehiculos`.`numerochapa`    AS `chapa`,
+  `vehiculos`.`codigo`         AS `codigo`,
+  `vehiculos`.`numerochasis`   AS `chasis`,
+  `vehiculos`.`observacion`    AS `observacion`
+FROM (((((((((`detallesvehiculos`
+           JOIN `clientes`
+             ON ((`detallesvehiculos`.`codigocliente` = `clientes`.`CodigoCliente`)))
+          JOIN `vehiculos`
+            ON ((`detallesvehiculos`.`codigovehiculo` = `vehiculos`.`codigo`)))
+         JOIN `tipostransmision`
+           ON ((`vehiculos`.`codigotransmision` = `tipostransmision`.`codigotransmision`)))
+        JOIN `tracciones`
+          ON ((`vehiculos`.`codigotraccion` = `tracciones`.`codigo`)))
+       JOIN `modelosvehiculos`
+         ON ((`vehiculos`.`codigomodelo` = `modelosvehiculos`.`codigomodelo`)))
+      JOIN `marcasvehiculos`
+        ON ((`vehiculos`.`codigomarca` = `marcasvehiculos`.`codigomarca`)))
+     JOIN `tiposcombustibles`
+       ON ((`vehiculos`.`codigotipocombustible` = `tiposcombustibles`.`codigo`)))
+    JOIN `colores`
+      ON ((`vehiculos`.`codigocolor` = `colores`.`codigocolor`)))
+   JOIN `anios`
+     ON ((`vehiculos`.`codigoanio` = `anios`.`codigo`))))$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+ALTER ALGORITHM=UNDEFINED DEFINER=`manager`@`%` SQL SECURITY DEFINER VIEW `vordentrabajo` AS (
+SELECT
+  `clientes`.`Cedula`                   AS `Cedula`,
+  `clientes`.`CodigoCliente`            AS `CodigoCliente`,
+  `clientes`.`RazonSocial`              AS `RazonSocial`,
+  `detallesrecepciones`.`km`            AS `kmrecepcion`,
+  `detallesrecepciones`.`numero`        AS `numero`,
+  `vehiculos`.`numerochapa`             AS `numerochapa`,
+  `recepciones`.`observaciones`         AS `observacionrecepcion`,
+  `recepciones`.`fechaentrada`          AS `fechaentrada`,
+  `ordenestrabajos`.`fechaemision`      AS `fechaemision`,
+  `ordenestrabajos`.`observacion`       AS `observacionorden`,
+  `ordenestrabajos`.`codigoestadoorden` AS `codigoestadoorden`,
+  `estadosorentrabajos`.`descripcion`   AS `estadorden`
+FROM (((((`recepciones`
+       JOIN `clientes`
+         ON ((`recepciones`.`codigocliente` = `clientes`.`CodigoCliente`)))
+      JOIN `detallesrecepciones`
+        ON (((`detallesrecepciones`.`codigosucursal` = `recepciones`.`codigosucursal`)
+             AND (`detallesrecepciones`.`puntoexpedicion` = `recepciones`.`puntoexpedicion`)
+             AND (`detallesrecepciones`.`numero` = `recepciones`.`numero`))))
+     JOIN `vehiculos`
+       ON ((`detallesrecepciones`.`codigovehiculos` = `vehiculos`.`codigo`)))
+    JOIN `ordenestrabajos`
+      ON (((`ordenestrabajos`.`codigosucursal` = `recepciones`.`codigosucursal`)
+           AND (`ordenestrabajos`.`puntoexpedicion` = `recepciones`.`puntoexpedicion`)
+           AND (`ordenestrabajos`.`numero` = `recepciones`.`numero`))))
+   JOIN `estadosorentrabajos`
+     ON ((`ordenestrabajos`.`codigoestadoorden` = `estadosorentrabajos`.`codigo`))))$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+ALTER ALGORITHM=UNDEFINED DEFINER=`manager`@`%` SQL SECURITY DEFINER VIEW `veditaroden` AS (
+SELECT
+  `ordenestrabajos`.`horaentrega`                  AS `horaentrega`,
+  `ordenestrabajos`.`fechaentrega`                 AS `fechaentrega`,
+  `ordenestrabajos`.`horafinalizacion`             AS `horafinalizacion`,
+  `ordenestrabajos`.`fechafinalizacion`            AS `fechafinalizacion`,
+  `ordenestrabajos`.`horatentativaentrega`         AS `horatentativaentrega`,
+  `ordenestrabajos`.`fechatentativaentrega`        AS `fechatentativaentrega`,
+  `ordenestrabajos`.`horaemision`                  AS `horaemision`,
+  `ordenestrabajos`.`fechaemision`                 AS `fechaemision`,
+  `ordenestrabajos`.`observacion`                  AS `observacion`,
+  `ordenestrabajos`.`codigoestadoorden`            AS `codigoestadoorden`,
+  `ordenestrabajos`.`numero`                       AS `numero`,
+  `detallesordentrabajos`.`codigoestadoreparacion` AS `codigoestadoreparacion`,
+  `detallesordentrabajos`.`codigoimpuesto`         AS `codigoimpuesto`,
+  `detallesordentrabajos`.`precio`                 AS `precio`,
+  `detallesordentrabajos`.`descripcion`            AS `descripcion`,
+  `detallesordentrabajos`.`cantidad`               AS `cantidad`,
+  `detallesordentrabajos`.`codigomecanico`         AS `codigomecanico`,
+  `detallesordentrabajos`.`codigoproducto`         AS `codigoproducto`,
+  `recepciones`.`observaciones`                    AS `observaciones`,
+  `recepciones`.`horaentrada`                      AS `horaentrada`,
+  `recepciones`.`fechaentrada`                     AS `fechaentrada`,
+  `recepciones`.`estado`                           AS `estado`,
+  `recepciones`.`recibidopor`                      AS `recibidopor`,
+  `recepciones`.`codigocliente`                    AS `codigocliente`,
+  `detallesrecepciones`.`km`                       AS `km`,
+  `vehiculos`.`numerochapa`                        AS `numerochapa`,
+  `vehiculos`.`numerochasis`                       AS `numerochasis`,
+  `detallesrecepciones`.`codigonivelcombustible`   AS `codigonivelcombustible`,
+  `nivelescombustibles`.`descripcion`              AS `nivel`,
+  `estadosorentrabajos`.`descripcion`              AS `estatrabajo`,
+  CONCAT(`ordenestrabajos`.`codigoestadoorden`,' ',`estadosorentrabajos`.`descripcion`) AS `estadorden`,
+  `estadosrecepciones`.`descripcion`               AS `estarecepcion`,
+  `usuarios`.`Nombre`                              AS `Nombre`,
+  `usuarios`.`Apellido`                            AS `Apellido`,
+  CONCAT(`detallesordentrabajos`.`codigomecanico`,' ',`usuarios`.`Nombre`,' ',`usuarios`.`Apellido`) AS `mecanico`,
+  `detallesordentrabajos`.`precio`*`detallesordentrabajos`.`cantidad` AS subtotal,
+   `clientes`.`RazonSocial` AS RazonSocial
+FROM ((((((((`detallesordentrabajos`
+          JOIN `ordenestrabajos`
+            ON (((`detallesordentrabajos`.`codigosucursal` = `ordenestrabajos`.`codigosucursal`)
+                 AND (`detallesordentrabajos`.`puntoexpedicion` = `ordenestrabajos`.`puntoexpedicion`)
+                 AND (`detallesordentrabajos`.`numero` = `ordenestrabajos`.`numero`))))
+         JOIN `recepciones`
+           ON (((`ordenestrabajos`.`codigosucursal` = `recepciones`.`codigosucursal`)
+                AND (`ordenestrabajos`.`puntoexpedicion` = `recepciones`.`puntoexpedicion`)
+                AND (`ordenestrabajos`.`numero` = `recepciones`.`numero`))))
+        JOIN `detallesrecepciones`
+          ON (((`detallesrecepciones`.`codigosucursal` = `recepciones`.`codigosucursal`)
+               AND (`detallesrecepciones`.`puntoexpedicion` = `recepciones`.`puntoexpedicion`)
+               AND (`detallesrecepciones`.`numero` = `recepciones`.`numero`))))
+       JOIN `vehiculos`
+         ON ((`detallesrecepciones`.`codigovehiculos` = `vehiculos`.`codigo`)))
+      JOIN `nivelescombustibles`
+        ON ((`detallesrecepciones`.`codigonivelcombustible` = `nivelescombustibles`.`codigonivelcombustible`)))
+     JOIN `estadosorentrabajos`
+       ON ((`ordenestrabajos`.`codigoestadoorden` = `estadosorentrabajos`.`codigo`)))
+    JOIN `estadosrecepciones`
+      ON ((`recepciones`.`estado` = `estadosrecepciones`.`codigo`)))
+   JOIN `usuarios`
+     ON ((`detallesordentrabajos`.`codigomecanico` = `usuarios`.`CodigoUsuario`))
+ JOIN `clientes` 
+        ON (`recepciones`.`codigocliente` = `clientes`.`CodigoCliente`)))$$
+
+DELIMITER ;

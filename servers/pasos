@@ -1,0 +1,11 @@
+npm i express
+npm i morgan
+npm i promise-mysql@3
+npm i cors
+
+npm install -g typescript
+npm i nodemon -D
+
+npm i @types/morgan
+npm i @types/express
+npm i @types/cors
